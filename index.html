@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versioneer | Software Version Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8 antialiased font-sans">
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="mb-12 border-b border-slate-800 pb-6">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2">Versioneer</h1>
+            <p class="text-slate-400">Open-source software version tracker for automated patching and deployments.</p>
+        </header>
+
+        <div class="mb-8">
+            <input type="text" id="searchInput" placeholder="Search applications..." 
+                   class="w-full max-w-md px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 text-slate-200 transition-colors">
+        </div>
+
+        <div id="appGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+    </div>
+
+    <script>
+        // Fetch the generated JSON file
+        async function loadApps() {
+            try {
+                // In production, this fetches your generated versions.json
+                // We are mocking the fetch response here for the static example
+                const mockData = {
+                    "AdobeAcrobat": "24.002.20759",
+                    "GoogleChrome": "126.0.6478.114",
+                    "MozillaFirefox": "127.0.1",
+                    "7-Zip": "24.05"
+                };
+                renderGrid(mockData);
+            } catch (error) {
+                console.error("Error loading versions:", error);
+            }
+        }
+
+        function renderGrid(apps) {
+            const grid = document.getElementById('appGrid');
+            grid.innerHTML = '';
+
+            for (const [app, version] of Object.entries(apps)) {
+                // Create a clean display name (e.g., AdobeAcrobat -> Adobe Acrobat)
+                const displayName = app.replace(/([A-Z])/g, ' $1').trim();
+                const apiPath = `/api/${app}/`;
+
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-6 hover:border-blue-500/50 transition-all duration-300 group';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-xl font-semibold text-slate-100">${displayName}</h2>
+                        <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md font-mono border border-blue-500/20">v${version}</span>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700/50">
+                        <p class="text-xs text-slate-400 mb-2 font-semibold tracking-wider uppercase">API Endpoint</p>
+                        <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-md border border-slate-800">
+                            <code class="text-xs text-slate-300 flex-1 overflow-x-auto">curl versioneer.com${apiPath}</code>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        loadApps();
+    </script>
+</body>
+</html>
